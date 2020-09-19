@@ -17,6 +17,7 @@ def load_data(directory):
     """
     Load data from CSV files into memory.
     """
+
     # Load people
     with open(f"{directory}/people.csv", encoding="utf-8") as f:
         reader = csv.DictReader(f)
@@ -53,6 +54,11 @@ def load_data(directory):
 
 
 def main():
+    """
+    The main function
+    """
+
+    # check no. of arguments provided
     if len(sys.argv) > 2:
         sys.exit("Usage: python degrees.py [directory]")
     directory = sys.argv[1] if len(sys.argv) == 2 else "large"
@@ -62,16 +68,28 @@ def main():
     load_data(directory)
     print("Data loaded.")
 
+    # run untill user exits
     while True:
+
+        # if source or target is not found inform the user and restart
         source = person_id_for_name(input("Name Source: "))
         if source is None:
-            sys.exit("Person not found.")
+            print(f"{source} not found.")
+            continue
         target = person_id_for_name(input("Name Target: "))
         if target is None:
-            sys.exit("Person not found.")
+            print(f"{target} not found.")
+            continue
 
+        # check for same name for target and source
+        if target == source:
+            print("0 degrees of seperation")
+            continue
+
+        # finding shortest path
         path = shortest_path(source, target)
 
+        # if path exists then print path
         if path is None:
             print("Not connected.")
         else:
@@ -84,8 +102,10 @@ def main():
                 movie = movies[path[i + 1][0]]["title"]
                 print(f"{i + 1}: {person1} and {person2} starred in {movie}")
 
+        # check if user wants to exit
         choice = input("\nContinue?\n")
         if choice in ['no', 'n', 'No', 'NO', 'N', 'nO']:
+            print("Exiting...")
             break
 
 
@@ -96,39 +116,50 @@ def shortest_path(source, target):
 
     If no possible path, returns None.
     """
+
+    # initializing the frontier and the first node with source
     node = Node(state=source, parent=None, action=None)
-    ds = QueueFrontier()
+    ds = QueueFrontier()  # frontier
     ds.add(node)
-    visited = set()
-    while True:
-        if ds.empty():
-            return None
+    visited = set()  # keeps track of visited states
+
+    while not ds.empty():
         node = ds.remove()
         visited.add(node.state)
-        solution = solve(node, target)
-        if solution:
-            print(f'{len(visited)} nodes visited')
-            return solution
+
+        # check for all neighbors in the popped state
         for movieId, personId in neighbors_for_person(node.state):
             if not ds.contains_state(personId) and personId not in visited:
                 newNode = Node(state=personId, parent=node, action=movieId)
-                solution = solve(newNode, target)
-                if solution:
+
+                # if the nodes state is equal to target then we found the solution
+                if newNode.state == target:
+                    solution = solve(newNode, target)
                     print(f'{len(visited)+1} nodes visited')
                     return solution
+
+                # else add the new node to the frontier to traverse later
                 ds.add(newNode)
+
+    # if the frontier is exhausted without finding the answer that means that answer doesn't exist
     return None
 
 
 def solve(node, target):
-    if node.state == target:
-        path = []
-        while node.parent is not None:
-            path.append((node.action, node.state))
-            node = node.parent
-        path.reverse()
-        return path
-    return None
+    """
+    Returns the path if solution is found.
+    From source to target.
+    """
+
+    path = []  # list to store the path from source to target
+
+    # loop from current node which is target, untill parent is not null, since only the source's parent is null
+    while node.parent is not None:
+        path.append((node.action, node.state))
+        node = node.parent
+
+    path.reverse()
+    return path
 
 
 def person_id_for_name(name):
@@ -136,10 +167,10 @@ def person_id_for_name(name):
     Returns the IMDB id for a person's name,
     resolving ambiguities as needed.
     """
-    person_ids = list(names.get(name.lower(), set()))
+    person_ids = list(names.get(name.lower(), set()))  # get matching names
     if len(person_ids) == 0:
         return None
-    elif len(person_ids) > 1:
+    elif len(person_ids) > 1:  # if multiple matches found then let user select
         print(f"Which '{name}'?")
         for person_id in person_ids:
             person = people[person_id]
@@ -163,7 +194,7 @@ def neighbors_for_person(person_id):
     who starred with a given person.
     """
     movie_ids = people[person_id]["movies"]
-    neighbors = set()
+    neighbors = set()  # stores the neighbor nodes
     for movie_id in movie_ids:
         for person_id in movies[movie_id]["stars"]:
             neighbors.add((movie_id, person_id))

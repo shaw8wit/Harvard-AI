@@ -6,6 +6,10 @@ class Node():
 
 
 class StackFrontier():
+    """
+    For DFS Traversal
+    """
+
     def __init__(self):
         self.frontier = []
 
@@ -28,6 +32,9 @@ class StackFrontier():
 
 
 class QueueFrontier(StackFrontier):
+    """
+    For BFS Traversal
+    """
 
     def remove(self):
         if self.empty():
