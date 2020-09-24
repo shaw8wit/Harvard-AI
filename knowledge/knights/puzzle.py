@@ -12,21 +12,43 @@ CKnave = Symbol("C is a Knave")
 # Puzzle 0
 # A says "I am both a knight and a knave."
 knowledge0 = And(
-    # TODO
+    # general rules
+    Or(AKnave, AKnight),
+    Implication(AKnave, Not(AKnight)),
+    Implication(AKnight, Not(AKnave)),
+    # puzzle statement
+    Biconditional(AKnight, And(AKnight, AKnave)),
 )
 
 # Puzzle 1
 # A says "We are both knaves."
 # B says nothing.
 knowledge1 = And(
-    # TODO
+    # general rules
+    Or(AKnave, AKnight),
+    Implication(AKnave, Not(AKnight)),
+    Implication(AKnight, Not(AKnave)),
+    Or(BKnave, BKnight),
+    Implication(BKnave, Not(BKnight)),
+    Implication(BKnight, Not(BKnave)),
+    # puzzle statement
+    Biconditional(AKnight, And(BKnave, AKnave)),
 )
 
 # Puzzle 2
 # A says "We are the same kind."
 # B says "We are of different kinds."
 knowledge2 = And(
-    # TODO
+    # general rules
+    Or(AKnave, AKnight),
+    Implication(AKnave, Not(AKnight)),
+    Implication(AKnight, Not(AKnave)),
+    Or(BKnave, BKnight),
+    Implication(BKnave, Not(BKnight)),
+    Implication(BKnight, Not(BKnave)),
+    # puzzle statement
+    Biconditional(AKnight, Or(And(AKnave, BKnave), And(AKnight, BKnight))),
+    Biconditional(BKnight, Or(And(AKnave, BKnight), And(AKnight, BKnave))),
 )
 
 # Puzzle 3
@@ -35,7 +57,21 @@ knowledge2 = And(
 # B says "C is a knave."
 # C says "A is a knight."
 knowledge3 = And(
-    # TODO
+    # general rules
+    Or(AKnave, AKnight),
+    Implication(AKnave, Not(AKnight)),
+    Implication(AKnight, Not(AKnave)),
+    Or(BKnave, BKnight),
+    Implication(BKnave, Not(BKnight)),
+    Implication(BKnight, Not(BKnave)),
+    Or(CKnave, CKnight),
+    Implication(CKnave, Not(CKnight)),
+    Implication(CKnight, Not(CKnave)),
+    # puzzle statement
+    Biconditional(AKnight, Or(AKnight, AKnave)),
+    Biconditional(BKnight, Biconditional(AKnight, AKnave)),
+    Biconditional(BKnight, CKnave),
+    Biconditional(CKnight, AKnight),
 )
 
 
