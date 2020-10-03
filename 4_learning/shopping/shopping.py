@@ -1,5 +1,6 @@
 import csv
 import sys
+import pandas as pd
 
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
@@ -59,7 +60,20 @@ def load_data(filename):
     labels should be the corresponding list of labels, where each label
     is 1 if Revenue is true, and 0 otherwise.
     """
-    raise NotImplementedError
+    df = pd.read_csv(filename)
+    df.Month.replace({'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Oct': 9,
+                      'June': 5, 'Jul': 6, 'Aug': 7, 'Nov': 10, 'Sep': 8, 'Dec': 11}, inplace=True)
+    df.VisitorType.replace(
+        {'Returning_Visitor': 1, 'New_Visitor': 0, 'Other': 0}, inplace=True)
+    df.Weekend.replace({True: 1, False: 0}, inplace=True)
+    df.Revenue.replace({True: 1, False: 0}, inplace=True)
+    X = df[['Administrative', 'Administrative_Duration', 'Informational',
+            'Informational_Duration', 'ProductRelated', 'ProductRelated_Duration',
+            'BounceRates', 'ExitRates', 'PageValues', 'SpecialDay', 'Month',
+            'OperatingSystems', 'Browser', 'Region', 'TrafficType', 'VisitorType',
+            'Weekend']]
+    y = df['Revenue'].values
+    return X, y
 
 
 def train_model(evidence, labels):
@@ -67,7 +81,8 @@ def train_model(evidence, labels):
     Given a list of evidence lists and a list of labels, return a
     fitted k-nearest neighbor model (k=1) trained on the data.
     """
-    raise NotImplementedError
+    model = KNeighborsClassifier(n_neighbors=1)
+    return model.fit(evidence, labels)
 
 
 def evaluate(labels, predictions):
@@ -85,7 +100,18 @@ def evaluate(labels, predictions):
     representing the "true negative rate": the proportion of
     actual negative labels that were accurately identified.
     """
-    raise NotImplementedError
+    total_pos, total_neg, pred_pos, pred_neg = 0, 0, 0, 0
+    for i, j in zip(predictions, labels):
+        if j:
+            if i:
+                pred_pos += 1
+            total_pos += 1
+        else:
+            total_neg += 1
+            if i:
+                continue
+            pred_neg += 1
+    return pred_pos/total_pos, pred_neg/total_neg
 
 
 if __name__ == "__main__":
