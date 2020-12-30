@@ -1,3 +1,3 @@
-# cs50-AI
+# cs50-ai
 
-Solutions for the Harvard cs50-AI course from [OpenCourseware](https://cs50.harvard.edu/ai/2020/) on the basics of Artificial Intelligence with Python.
+Solutions for CS50’s Introduction to Artificial Intelligence with Python course from [OpenCourseware](https://cs50.harvard.edu/ai/2020/) by Harvard.
